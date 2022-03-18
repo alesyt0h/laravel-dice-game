@@ -14,6 +14,24 @@ class AuthController extends Controller
 {
     public function login(Request $request){
 
+        $credentials = Validator::make($request->all(), [
+            'email' => ['required'],
+            'password' => ['required'],
+        ]);
+
+        if ($credentials->fails()){
+            return response()->json(['errors' => $credentials->messages()], Response::HTTP_BAD_REQUEST);
+        }
+
+        if(!Auth::attempt($credentials->validated())){
+            return response([
+                'message' => 'Invalid user or password'
+            ], 401);
+        }
+
+        $accessToken = auth()->user()->createToken('gameAccessToken')->accessToken;
+
+        return response(['user' => auth()->user(), 'access_token' => $accessToken]);
     }
 
     public function register(Request $request){
