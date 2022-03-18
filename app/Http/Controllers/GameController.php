@@ -31,6 +31,15 @@ class GameController extends Controller
 
     public function getThrows(Int $id){
 
+        if(!isSameUser($id)) return response(['message' => 'Unauthorized']);
+
+        $throws = Game::where('player_id', $id)->get();
+
+        if(!count($throws)) return response(['message' => 'This user doesn\'t have any throws']);
+
+        $wins = calculateWins($throws);
+
+        return response(['throws' => $throws, 'winning_percentage' => $wins]);
     }
 
     public function ranking(){
