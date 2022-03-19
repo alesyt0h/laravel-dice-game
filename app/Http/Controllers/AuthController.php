@@ -31,13 +31,17 @@ class AuthController extends Controller
 
         $accessToken = auth()->user()->createToken('gameAccessToken')->accessToken;
 
+        if(!auth()->user()->nickname){
+            auth()->user()->nickname = 'Anonymous';
+        }
+
         return response(['user' => auth()->user(), 'access_token' => $accessToken]);
     }
 
     public function register(Request $request){
 
         $credentials = Validator::make($request->all(), [
-            'nickname' => ['string', 'min:4','max:15'],
+            'nickname' => ['nullable', 'string', 'min:4', 'max:15'],
             'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['required', Rules\Password::defaults()],
         ]);
@@ -46,23 +50,33 @@ class AuthController extends Controller
             return response()->json(['errors' => $credentials->messages()], Response::HTTP_BAD_REQUEST);
         }
 
-        // TODO Make Validation Rule
-        $match = User::select('nickname')->where('nickname', $request->nickname)->get();
+        try {
+            $user = User::create([
+                'nickname' => $request->nickname ?? null,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+        } catch (\Illuminate\Database\QueryException $exception) {
 
-        if(count($match)){
-            return response(['message' => 'This nickname is already taken. Please choose another.']);
+            $errMsg = $exception->getMessage();
+            $errCode = $exception->getCode();
+            $nicknameErr = str_contains($errMsg, 'users_nickname_unique');
+            $emailErr = str_contains($errMsg, 'users_email_unique');
+
+            if($nicknameErr && $errCode === '23000'){
+                return response(['error' => 'This nickname is already taken. Please choose another.']);
+            } else if ($emailErr && $errCode === '23000'){
+                return response(['error' => 'This email address is already in use. Please choose another.']);
+            } else {
+                return response(['error' => $exception->errorInfo]);
+            }
         }
-        //
 
-        if(! ($request->nickname ?? '')){
-            $request->nickname = 'Anonymous';
+        if(!$user->nickname){
+            $user->nickname = 'Anonymous';
         }
 
-        $user = User::create([
-            'nickname' => $request->nickname,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        Auth::login($user);
 
         $accessToken  = $user->createToken('gameAccessToken')->accessToken;
 
