@@ -29,7 +29,11 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $accessToken = auth()->user()->createToken('gameAccessToken')->accessToken;
+        if(auth()->user()->is_admin){
+            $accessToken = auth()->user()->createToken('adminToken', ['administrate'])->accessToken;
+        } else {
+            $accessToken = auth()->user()->createToken('userToken')->accessToken;
+        }
 
         if(!auth()->user()->nickname){
             auth()->user()->nickname = 'Anonymous';
