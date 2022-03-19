@@ -58,6 +58,8 @@ class GameController extends Controller
         $players = User::all();
         $loser = perUserPercentage($players, 'loser');
 
+        $loser = anonymousSetter($loser);
+
         return response(['loser' => $loser]);
     }
 
@@ -65,6 +67,8 @@ class GameController extends Controller
 
         $players = User::all();
         $winner = perUserPercentage($players, 'winner');
+
+        $winner = anonymousSetter($winner);
 
         return response(['winner' => $winner]);
     }

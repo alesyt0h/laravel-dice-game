@@ -61,9 +61,28 @@ use App\Models\Game;
                 unset($players[$i]->throws);
             }
 
-            return ($type) ? $resultingPlayer : $players;
+            return ($type) ? $resultingPlayer ?? 'There are no winned or losed throws yet in the system' : $players;
         }
     }
 
+    if (! function_exists('anonymousSetter')) {
+        function anonymousSetter(mixed $data, $single = true){
+
+            if(!$single){
+                foreach ($data as $user) {
+                    if(!$user->nickname){
+                        $user->nickname = 'Anonymous';
+                    }
+                }
+            } else {
+                if(!$data->nickname){
+                    $data->nickname = 'Anonymous';
+                }
+            }
+
+            return $data;
+        }
+
+    }
 
 ?>
