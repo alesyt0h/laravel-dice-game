@@ -62,6 +62,13 @@ class UserController extends Controller
     public function getUsers(){
 
         $users = User::all();
+
+        foreach ($users as $key => $user) {
+            if(!$user->nickname){
+                $user->nickname = 'Anonymous';
+            }
+        }
+
         perUserPercentage($users);
 
         return $users;
