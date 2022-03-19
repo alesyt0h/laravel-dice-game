@@ -10,7 +10,7 @@ class GameController extends Controller
 {
     public function play(Int $id){
 
-        if(!isSameUser($id)) return response(['message' => 'Unauthorized']);
+        if(!isSameUser($id) && !isAdmin()) return response(['message' => 'Unauthorized']);
 
         $blackDice = rand(1, 6);
         $redDice = rand(1, 6);
@@ -31,7 +31,7 @@ class GameController extends Controller
 
     public function getThrows(Int $id){
 
-        if(!isSameUser($id)) return response(['message' => 'Unauthorized']);
+        if(!isSameUser($id) && !isAdmin()) return response(['message' => 'Unauthorized']);
 
         $throws = Game::where('player_id', $id)->get();
 
@@ -43,6 +43,8 @@ class GameController extends Controller
     }
 
     public function ranking(){
+
+        if(!isAdmin()) return response(['message' => 'Unauthorized']);
 
         $throws = Game::all();
 

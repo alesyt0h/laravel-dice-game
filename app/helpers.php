@@ -3,9 +3,16 @@
 use App\Models\Game;
 
     if (! function_exists('isSameUser')) {
-        function isSameUser(Int $id)
-        {
+        function isSameUser(Int $id){
             if($id === auth()->user()->id){
+                return true;
+            }
+        }
+    }
+
+    if (! function_exists('isAdmin')) {
+        function isAdmin(){
+            if(auth()->user()->tokenCan('administrate')){
                 return true;
             }
         }
@@ -82,7 +89,6 @@ use App\Models\Game;
 
             return $data;
         }
-
     }
 
 ?>

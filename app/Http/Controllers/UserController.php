@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function update(Request $request, Int $id){
 
-        if(!isSameUser($id)) return response(['message' => 'Unauthorized']);
+        if(!isSameUser($id) && !isAdmin()) return response(['message' => 'Unauthorized']);
 
         $credentials = Validator::make($request->all(), [
             'nickname' => ['string', 'min:4','max:15']
@@ -46,7 +46,7 @@ class UserController extends Controller
 
     public function deleteThrows(Int $id){
 
-        if(!isSameUser($id)) return response(['message' => 'Unauthorized']);
+        if(!isSameUser($id) && !isAdmin()) return response(['message' => 'Unauthorized']);
 
         $result = Game::where('player_id', $id)->delete();
 
@@ -60,6 +60,8 @@ class UserController extends Controller
     }
 
     public function getUsers(){
+
+        if(!isAdmin()) return response(['message' => 'Unauthorized']);
 
         $users = User::all();
 
