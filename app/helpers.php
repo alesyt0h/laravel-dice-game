@@ -39,6 +39,8 @@ use App\Models\Game;
                 $players[$i]->throws = Game::where('player_id', $players[$i]->id)->get();
 
                 if (!count($players[$i]->throws)){
+                    unset($players[$i]->throws);
+                    $players[$i]->winning_percentage = null;
                     continue;
                 }
 
@@ -48,17 +50,15 @@ use App\Models\Game;
                     if($players[$i]->winning_percentage < $initialValue){
                         $initialValue = $players[$i]->winning_percentage;
                         $resultingPlayer = $players[$i];
-
-                        unset($resultingPlayer->throws);
                     }
                 } else if ($type === 'winner'){
                     if($players[$i]->winning_percentage > $initialValue){
                         $initialValue = $players[$i]->winning_percentage;
                         $resultingPlayer = $players[$i];
-
-                        unset($resultingPlayer->throws);
                     }
                 }
+
+                unset($players[$i]->throws);
             }
 
             return ($type) ? $resultingPlayer : $players;
