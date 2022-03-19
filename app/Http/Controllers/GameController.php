@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class GameController extends Controller
@@ -26,7 +27,6 @@ class GameController extends Controller
         unset($throw->player_id);
 
         return response(['result' => $throw]);
-
     }
 
     public function getThrows(Int $id){
@@ -44,6 +44,13 @@ class GameController extends Controller
 
     public function ranking(){
 
+        $throws = Game::all();
+
+        if(!count($throws)) return response(['message' => 'There are no throws in the system :(']);
+
+        $wins = calculateWins($throws);
+
+        return response(['winning_percentage' => $wins]);
     }
 
     public function loser(){
