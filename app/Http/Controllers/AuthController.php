@@ -72,9 +72,7 @@ class AuthController extends Controller
             }
         }
 
-        if(!$user->nickname){
-            $user->nickname = 'Anonymous';
-        }
+        $user = anonymousSetter($user);
 
         Auth::login($user);
 

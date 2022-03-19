@@ -63,13 +63,8 @@ class UserController extends Controller
 
         $users = User::all();
 
-        foreach ($users as $key => $user) {
-            if(!$user->nickname){
-                $user->nickname = 'Anonymous';
-            }
-        }
-
-        perUserPercentage($users);
+        $users = anonymousSetter($users, false);
+        $users = perUserPercentage($users);
 
         return $users;
     }
