@@ -55,9 +55,17 @@ class GameController extends Controller
 
     public function loser(){
 
+        $players = User::all();
+        $loser = perUserPercentage($players, 'loser');
+
+        return response(['loser' => $loser]);
     }
 
     public function winner(){
 
+        $players = User::all();
+        $winner = perUserPercentage($players, 'winner');
+
+        return response(['winner' => $winner]);
     }
 }
