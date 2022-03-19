@@ -5,11 +5,29 @@ namespace App\Http\Controllers;
 use App\Models\Game;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
     public function update(Request $request, Int $id){
 
+        if(!isSameUser($id)) return response(['message' => 'Unauthorized']);
+
+        // TODO Unique nickname
+        $credentials = Validator::make($request->all(), [
+            'nickname' => ['string', 'min:4','max:15']
+        ]);
+        //
+
+        if ($credentials->fails()){
+            return response()->json(['error' => $credentials->messages()], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = User::find($id);
+
+        $user->update(['nickname' => $request->nickname]);
+
+        return response(['user' => $user, 'message' => 'Updated the nickname correctly']);
     }
 
     public function deleteThrows(Int $id){
