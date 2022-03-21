@@ -215,4 +215,90 @@ class CRUDTest extends TestCase
         $response->assertStatus(403);
     }
 
+    /** @test */
+    public function update_nickname_updates_correctly_and_200_and_returns_expected_JSON(){
+
+        $newNickname = 'Juanito';
+
+        $user = User::factory()->create();
+        $user = Passport::actingAs($user);
+
+        $response = $this->put(route('update.player', $user->id), [
+            'nickname' => $newNickname
+        ], ['Accept' => 'application/json']);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([ 'message' => 'Updated the nickname correctly' ]);
+        $response->assertJsonStructure([
+            'user' => [
+                'id',
+                'nickname',
+                'email',
+                'is_admin',
+                'created_at',
+                'updated_at',
+            ],
+            'message'
+        ]);
+        $this->assertDatabaseHas('users', [
+            'nickname' => $newNickname
+        ]);
+    }
+
+    /** @test */
+    public function update_nickname_returns_200_even_with_no_data(){
+
+        $user = User::factory()->create();
+        $user = Passport::actingAs($user);
+
+        $response = $this->put(route('update.player', $user->id), [], ['Accept' => 'application/json']);
+
+        $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function update_nickname_returns_forbidden_if_not_the_same_user(){
+
+        $user = User::factory()->create();
+        $user = Passport::actingAs($user);
+
+        $response = $this->put(route('update.player', $user->id + 1), [
+            'nickname' => 'Juanito Valderrama'
+        ], ['Accept' => 'application/json']);
+
+        $response->assertStatus(403);
+    }
+
+    /** @test */
+    public function update_nickname_returns_409_and_your_nickname_is_same_msg(){
+
+        $user = User::factory()->create();
+        $user = Passport::actingAs($user);
+
+        $response = $this->put(route('update.player', $user->id), [
+            'nickname' => $user->nickname
+        ], ['Accept' => 'application/json']);
+
+        $response->assertStatus(409);
+        $response->assertJsonFragment([
+            'message' => 'You already have that nickname'
+        ]);
+    }
+
+    /** @test */
+    public function update_nickname_returns_error_msg_if_nickname_is_taken(){
+
+        $users = User::factory(2)->create();
+        Passport::actingAs($users[0]);
+
+        $response = $this->put(route('update.player', $users[0]->id), [
+            'nickname' => $users[1]->nickname
+        ], ['Accept' => 'application/json']);
+
+        $response->assertStatus(400);
+        $response->assertJsonFragment([
+            'error' => 'This nickname is already taken. Please choose another.'
+        ]);
+    }
+
 }
