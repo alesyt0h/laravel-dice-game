@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Game;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
@@ -150,4 +151,36 @@ class CRUDTest extends TestCase
         $response = $this->get(route('ranking'), ['Accept' => 'application/json']);
         $response->assertStatus(403);
     }
+
+    /** @test */
+    public function get_all_throws_returns_200_and_expected_throws_JSON(){
+
+        $user = User::factory()->create();
+        $user = Passport::actingAs($user);
+
+        for ($i=0; $i < 10; $i++) {
+            Game::factory(1)->create([
+                'id' => $i + 1,
+                'player_id' => $user->id
+            ]);
+        }
+
+        $response = $this->get(route('all.throws', $user->id), ['Accept' => 'application/json']);
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'throws' => [
+                [
+                    'id',
+                    'player_id',
+                    'black_dice',
+                    'red_dice',
+                    'result',
+                    'updated_at',
+                    'created_at'
+                ]
+            ]
+        ]);
+    }
+
 }
