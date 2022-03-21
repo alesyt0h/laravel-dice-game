@@ -7,7 +7,6 @@ use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Laravel\Passport\ClientRepository;
-use Laravel\Passport\Passport;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -83,6 +82,22 @@ class AuthTest extends TestCase
                 'nickname'
             ],
             'access_token'
+        ]);
+    }
+
+    /** @test */
+    public function login_returns_unauthorized_and_error_message_on_failed_credentials()
+    {
+        $response = $this->post(route('login'), [
+            'email' => 'notanemail',
+            'password' => '123'
+        ], ['Accept' => 'application/json']);
+
+        $response->status(401);
+        $response->assertJsonFragment([
+            'message' =>
+                'Invalid user or password'
+
         ]);
     }
 
