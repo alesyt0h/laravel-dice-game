@@ -99,4 +99,25 @@ class CRUDTest extends TestCase
         $response = $this->get(route('players'), ['Accept' => 'application/json']);
         $response->assertStatus(403);
     }
+
+    /** @test */
+    public function play_game_returns_200_and_expected_json_result()
+    {
+        $user = User::factory()->create();
+        $user = Passport::actingAs($user);
+
+        $response = $this->post(route('play', $user->id), ['Accept' => 'application/json']);
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'result' => [
+                'black_dice',
+                'red_dice',
+                'result',
+                'updated_at',
+                'created_at',
+                'id'
+            ]
+        ]);
+
+    }
 }
