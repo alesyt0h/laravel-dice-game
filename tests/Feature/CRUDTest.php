@@ -171,4 +171,48 @@ class CRUDTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function delete_throws_deletes_correctly_in_db_and_status_200_and_gives_success_message_JSON(){
+
+        $user = User::factory()->create();
+        $user = Passport::actingAs($user);
+
+        $throws = 10;
+
+        for ($i=0; $i < $throws; $i++) {
+            $games = Game::factory(1)->create([
+                'id' => $i + 1,
+                'player_id' => $user->id
+            ]);
+        }
+
+        $response = $this->delete(route('delete.throws', $user->id), ['Accept' => 'application/json']);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            'message' => 'Deleted ' . $throws . ' throws'
+        ]);
+        $this->assertDatabaseMissing('games', [
+            'id' => $games[0]->id
+        ]);
+    }
+
+    /** @test */
+    public function delete_throws_returns_forbidden_if_not_the_same_user(){
+
+        $user = User::factory()->create();
+        $user = Passport::actingAs($user);
+
+        for ($i=0; $i < 10; $i++) {
+            Game::factory(1)->create([
+                'id' => $i + 1,
+                'player_id' => $user->id
+            ]);
+        }
+
+        $response = $this->delete(route('delete.throws', $user->id + 1), ['Accept' => 'application/json']);
+
+        $response->assertStatus(403);
+    }
+
 }
