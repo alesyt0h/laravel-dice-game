@@ -25,5 +25,29 @@ class AuthTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function register_returns_validations_error()
+    {
+        $response = $this->post(route('register'), [
+            'nickname' => 'Imaverylongstring',
+            'email' => 'notanemail',
+            'password' => '123'
+        ], ['Accept' => 'application/json']);
+
+        $response->assertJsonFragment([
+            'errors' => [
+                'email' => [
+                    'The email must be a valid email address.'
+                ],
+                'nickname' => [
+                    'The nickname must not be greater than 15 characters.'
+                ],
+                'password' => [
+                    'The password must be at least 8 characters.'
+                ]
+            ]
+        ]);
+    }
+
 }
 
