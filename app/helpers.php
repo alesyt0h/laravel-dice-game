@@ -75,6 +75,8 @@ use App\Models\Game;
     if (! function_exists('anonymousSetter')) {
         function anonymousSetter(mixed $data, $single = true){
 
+            if(gettype($data) === 'string') return;
+
             if(!$single){
                 foreach ($data as $user) {
                     if(!$user->nickname){
