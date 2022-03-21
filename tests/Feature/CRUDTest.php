@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 
@@ -23,6 +22,47 @@ class CRUDTest extends TestCase
 
         $response = $this->get(route('winner'), ['Accept' => 'application/json']);
         $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function ranking_loser_and_winner_returns_expected_user_JSON()
+    {
+        $admin = User::factory()->make();
+        $admin = Passport::actingAs($admin, ['administrate']);
+
+        $users = User::factory(10)->create();
+
+        foreach ($users as $user) {
+            $response = $this->post(route('play', $user->id), ['Accept' => 'application/json']);
+        }
+
+        $response = $this->get(route('loser'), ['Accept' => 'application/json']);
+
+        $response->assertJsonStructure([
+            'loser' => [
+                'id',
+                'nickname',
+                'email',
+                'is_admin',
+                'created_at',
+                'updated_at',
+                'winning_percentage'
+            ]
+        ]);
+
+        $response = $this->get(route('winner'), ['Accept' => 'application/json']);
+
+        $response->assertJsonStructure([
+            'winner' => [
+                'id',
+                'nickname',
+                'email',
+                'is_admin',
+                'created_at',
+                'updated_at',
+                'winning_percentage'
+            ]
+        ]);
     }
 
     /** @test */
