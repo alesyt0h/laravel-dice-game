@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class GameController extends Controller
 {
+    protected string $forbiddenMsg = 'You are not authorized to perform this action';
+
     public function play(Int $id){
 
-        if(!isSameUser($id) && !isAdmin()) return response(['message' => 'Unauthorized']);
+        if(!isSameUser($id) && !isAdmin()) return response(['message' => $this->forbiddenMsg], 403);
 
         $blackDice = rand(1, 6);
         $redDice = rand(1, 6);
@@ -31,11 +32,11 @@ class GameController extends Controller
 
     public function getThrows(Int $id){
 
-        if(!isSameUser($id) && !isAdmin()) return response(['message' => 'Unauthorized']);
+        if(!isSameUser($id) && !isAdmin()) return response(['message' => $this->forbiddenMsg], 403);
 
         $throws = Game::where('player_id', $id)->get();
 
-        if(!count($throws)) return response(['message' => 'This user doesn\'t have any throws']);
+        if(!count($throws)) return response(['message' => 'This user doesn\'t have any throws'], 409);
 
         $wins = calculateWins($throws);
 
@@ -44,11 +45,11 @@ class GameController extends Controller
 
     public function ranking(){
 
-        if(!isAdmin()) return response(['message' => 'Unauthorized']);
+        if(!isAdmin()) return response(['message' => $this->forbiddenMsg], 403);
 
         $throws = Game::all();
 
-        if(!count($throws)) return response(['message' => 'There are no throws in the system :(']);
+        if(!count($throws)) return response(['message' => 'There are no throws in the system :('], 409);
 
         $wins = calculateWins($throws);
 
