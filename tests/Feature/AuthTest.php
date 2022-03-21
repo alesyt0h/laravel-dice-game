@@ -3,7 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Laravel\Passport\ClientRepository;
+use Laravel\Passport\Passport;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -49,5 +53,50 @@ class AuthTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function login_is_successful_and_returns_expected_json()
+    {
+        $user = User::factory()->make();
+
+        $this->createAccessClient();
+
+        $this->post(route('register'), [
+            'email' => $user->email,
+            'password' => $user->password
+        ], ['Accept' => 'application/json']);
+
+        $response = $this->post(route('login'), [
+            'email' => $user->email,
+            'password' => $user->password
+        ], ['Accept' => 'application/json']);
+
+        // var_dump($response->json());
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'user' => [
+                'created_at',
+                'updated_at',
+                'email',
+                'id',
+                'is_admin',
+                'nickname'
+            ],
+            'access_token'
+        ]);
+    }
+
+    public function createAccessClient(){
+        $clientRepository = new ClientRepository();
+        $client = $clientRepository->createPersonalAccessClient(
+            null, 'Test Personal Access Client', 'http://localhost'
+        );
+
+        DB::table('oauth_personal_access_clients')->insert([
+            'client_id' => $client->id,
+            'created_at' => new DateTime,
+            'updated_at' => new DateTime,
+        ]);
+    }
 }
 
