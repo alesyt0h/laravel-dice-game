@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +19,7 @@ class AuthController extends Controller
         ]);
 
         if ($credentials->fails()){
-            return response()->json(['errors' => $credentials->messages()], Response::HTTP_BAD_REQUEST);
+            return response()->json(['errors' => $credentials->messages()], 400);
         }
 
         if(!Auth::attempt($credentials->validated())){
@@ -51,7 +50,7 @@ class AuthController extends Controller
         ]);
 
         if ($credentials->fails()){
-            return response()->json(['errors' => $credentials->messages()], Response::HTTP_BAD_REQUEST);
+            return response()->json(['errors' => $credentials->messages()], 400);
         }
 
         try {
@@ -68,11 +67,11 @@ class AuthController extends Controller
             $emailErr = str_contains($errMsg, 'users_email_unique');
 
             if($nicknameErr && $errCode === '23000'){
-                return response(['error' => 'This nickname is already taken. Please choose another.']);
+                return response(['error' => 'This nickname is already taken. Please choose another.'], 409);
             } else if ($emailErr && $errCode === '23000'){
-                return response(['error' => 'This email address is already in use. Please choose another.']);
+                return response(['error' => 'This email address is already in use. Please choose another.'], 409);
             } else {
-                return response(['error' => $exception->errorInfo]);
+                return response(['error' => $exception->errorInfo], 409);
             }
         }
 
