@@ -23,6 +23,7 @@ Route::prefix('/players')->group( function(){
     Route::post('/login', [AuthController::class, 'login'])->name('login');
 
     Route::middleware(['auth:api'])->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/', [UserController::class, 'getUsers'])->name('players')->middleware('admin');
         Route::put('/{id}', [UserController::class, 'update'])->name('update.player');
         Route::delete('/{id}/games', [UserController::class, 'deleteThrows'])->name('delete.throws');
