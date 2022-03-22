@@ -11,7 +11,7 @@ class GameController extends Controller
 
     public function play(Int $id){
 
-        if(!isSameUser($id) && !isAdmin()) return response(['message' => $this->forbiddenMsg], 403);
+        if(!isSameUser($id) && !isAdmin()) return response()->json(['message' => $this->forbiddenMsg], 403);
 
         $blackDice = rand(1, 6);
         $redDice = rand(1, 6);
@@ -27,33 +27,33 @@ class GameController extends Controller
 
         unset($throw->player_id);
 
-        return response(['result' => $throw]);
+        return response()->json(['result' => $throw]);
     }
 
     public function getThrows(Int $id){
 
-        if(!isSameUser($id) && !isAdmin()) return response(['message' => $this->forbiddenMsg], 403);
+        if(!isSameUser($id) && !isAdmin()) return response()->json(['message' => $this->forbiddenMsg], 403);
 
         $throws = Game::where('player_id', $id)->get();
 
-        if(!count($throws)) return response(['message' => 'This user doesn\'t have any throws'], 409);
+        if(!count($throws)) return response()->json(['message' => 'This user doesn\'t have any throws'], 409);
 
         $wins = calculateWins($throws);
 
-        return response(['throws' => $throws, 'winning_percentage' => $wins]);
+        return response()->json(['throws' => $throws, 'winning_percentage' => $wins]);
     }
 
     public function ranking(){
 
-        if(!isAdmin()) return response(['message' => $this->forbiddenMsg], 403);
+        if(!isAdmin()) return response()->json(['message' => $this->forbiddenMsg], 403);
 
         $throws = Game::all();
 
-        if(!count($throws)) return response(['message' => 'There are no throws in the system :('], 409);
+        if(!count($throws)) return response()->json(['message' => 'There are no throws in the system :('], 409);
 
         $wins = calculateWins($throws);
 
-        return response(['winning_percentage' => $wins]);
+        return response()->json(['winning_percentage' => $wins]);
     }
 
     public function loser(){
@@ -63,7 +63,7 @@ class GameController extends Controller
 
         $loser = anonymousSetter($loser);
 
-        return response(['loser' => $loser]);
+        return response()->json(['loser' => $loser]);
     }
 
     public function winner(){
@@ -73,6 +73,6 @@ class GameController extends Controller
 
         $winner = anonymousSetter($winner);
 
-        return response(['winner' => $winner]);
+        return response()->json(['winner' => $winner]);
     }
 }
