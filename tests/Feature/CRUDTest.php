@@ -69,14 +69,16 @@ class CRUDTest extends TestCase
         $response = $this->get(route('players'), ['Accept' => 'application/json']);
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            [
-                'id',
-                'nickname',
-                'email',
-                'is_admin',
-                'created_at',
-                'updated_at',
-                'winning_percentage'
+            'users' => [
+                [
+                    'id',
+                    'nickname',
+                    'email',
+                    'is_admin',
+                    'created_at',
+                    'updated_at',
+                    'winning_percentage'
+                ]
             ]
         ]);
     }
@@ -295,7 +297,7 @@ class CRUDTest extends TestCase
             'nickname' => $users[1]->nickname
         ], ['Accept' => 'application/json']);
 
-        $response->assertStatus(400);
+        $response->assertStatus(409);
         $response->assertJsonFragment([
             'error' => 'This nickname is already taken. Please choose another.'
         ]);
