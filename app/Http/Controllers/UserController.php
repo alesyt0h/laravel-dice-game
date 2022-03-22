@@ -34,7 +34,7 @@ class UserController extends Controller
 
         try {
             $user->update([
-                'nickname' => $request->nickname
+                'nickname' => trim($request->nickname)
             ]);
         } catch (\Illuminate\Database\QueryException $exception) {
 
