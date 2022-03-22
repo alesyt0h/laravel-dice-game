@@ -23,7 +23,7 @@ class AuthController extends Controller
         }
 
         if(!Auth::attempt($credentials->validated())){
-            return response([
+            return response()->json([
                 'message' => 'Invalid user or password'
             ], 401);
         }
@@ -38,7 +38,7 @@ class AuthController extends Controller
             auth()->user()->nickname = 'Anonymous';
         }
 
-        return response(['user' => auth()->user(), 'access_token' => $accessToken]);
+        return response()->json(['user' => auth()->user(), 'access_token' => $accessToken]);
     }
 
     public function register(Request $request){
@@ -67,11 +67,11 @@ class AuthController extends Controller
             $emailErr = str_contains($errMsg, 'users_email_unique');
 
             if($nicknameErr && $errCode === '23000'){
-                return response(['error' => 'This nickname is already taken. Please choose another.'], 409);
+                return response()->json(['error' => 'This nickname is already taken. Please choose another.'], 409);
             } else if ($emailErr && $errCode === '23000'){
-                return response(['error' => 'This email address is already in use. Please choose another.'], 409);
+                return response()->json(['error' => 'This email address is already in use. Please choose another.'], 409);
             } else {
-                return response(['error' => $exception->errorInfo], 409);
+                return response()->json(['error' => $exception->errorInfo], 409);
             }
         }
 
@@ -81,7 +81,7 @@ class AuthController extends Controller
 
         $accessToken  = $user->createToken('gameAccessToken')->accessToken;
 
-        return response(['user' => $user, 'access_token' => $accessToken]);
+        return response()->json(['user' => $user, 'access_token' => $accessToken]);
     }
 
     public function logout(){

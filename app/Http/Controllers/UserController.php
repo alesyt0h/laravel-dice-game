@@ -14,7 +14,7 @@ class UserController extends Controller
 
     public function update(Request $request, Int $id){
 
-        if(!isSameUser($id) && !isAdmin()) return response(['message' => $this->forbiddenMsg], 403);
+        if(!isSameUser($id) && !isAdmin()) return response()->json(['message' => $this->forbiddenMsg], 403);
 
         $credentials = Validator::make($request->all(), [
             'nickname' => ['nullable', 'string', 'min:4','max:15']
@@ -27,7 +27,7 @@ class UserController extends Controller
         }
 
         if($request->nickname === auth()->user()->nickname){
-            return response(['message' => 'You already have that nickname'], 409);
+            return response()->json(['message' => 'You already have that nickname'], 409);
         }
 
         $user = User::find($id);
@@ -43,40 +43,40 @@ class UserController extends Controller
             $nicknameErr = str_contains($errMsg, 'nickname');
 
             if($nicknameErr && $errCode === '23000'){
-                return response(['error' => 'This nickname is already taken. Please choose another.'], 409);
+                return response()->json(['error' => 'This nickname is already taken. Please choose another.'], 409);
             } else {
-                return response(['error' => $exception->errorInfo], 409);
+                return response()->json(['error' => $exception->errorInfo], 409);
             }
         }
 
-        return response(['user' => $user, 'message' => 'Updated the nickname correctly']);
+        return response()->json(['user' => $user, 'message' => 'Updated the nickname correctly']);
     }
 
     public function deleteThrows(Int $id){
 
-        if(!isSameUser($id) && !isAdmin()) return response(['message' => $this->forbiddenMsg], 403);
+        if(!isSameUser($id) && !isAdmin()) return response()->json(['message' => $this->forbiddenMsg], 403);
 
         $result = Game::where('player_id', $id)->delete();
 
         if($result === 0){
-            return response(['message' => 'There are no throws to be deleted'], 409);
+            return response()->json(['message' => 'There are no throws to be deleted'], 409);
         }
 
         $result = 'Deleted ' . $result . (($result > 1) ? ' throws' : ' throw');
 
-        return response(['message' => $result]);
+        return response()->json(['message' => $result]);
     }
 
     public function getUsers(){
 
-        if(!isAdmin()) return response(['message' => $this->forbiddenMsg], 403);
+        if(!isAdmin()) return response()->json(['message' => $this->forbiddenMsg], 403);
 
         $users = User::all();
 
         $users = anonymousSetter($users, false);
         $users = perUserPercentage($users);
 
-        return $users;
+        return response()->json(['users' => $users]);
     }
 
 
