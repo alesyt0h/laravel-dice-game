@@ -34,7 +34,7 @@ class UserController extends Controller
 
         try {
             $user->update([
-                'nickname' => trim($request->nickname)
+                'nickname' => (!trim($request->nickname)) ? null : trim($request->nickname)
             ]);
         } catch (\Illuminate\Database\QueryException $exception) {
 
@@ -48,6 +48,8 @@ class UserController extends Controller
                 return response()->json(['error' => $exception->errorInfo], 409);
             }
         }
+
+        anonymousSetter($user);
 
         return response()->json(['user' => $user, 'message' => 'Updated the nickname correctly']);
     }
