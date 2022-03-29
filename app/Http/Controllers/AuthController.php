@@ -55,7 +55,7 @@ class AuthController extends Controller
 
         try {
             $user = User::create([
-                'nickname' => trim($request->nickname) ?? null,
+                'nickname' => (!trim($request->nickname)) ? null : trim($request->nickname),
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
