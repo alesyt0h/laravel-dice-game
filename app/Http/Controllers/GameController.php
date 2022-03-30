@@ -16,7 +16,7 @@ class GameController extends Controller
         $blackDice = rand(1, 6);
         $redDice = rand(1, 6);
 
-        $result = ($blackDice + $redDice === 7) ? 'lost' : 'win';
+        $result = ($blackDice + $redDice !== 7) ? 'lost' : 'win';
 
         $throw = Game::create([
             'player_id' => $id,
