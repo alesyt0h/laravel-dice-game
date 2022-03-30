@@ -97,6 +97,7 @@ class AuthController extends Controller
 
         if($validToken){
             $user = Auth::user();
+            $user = anonymousSetter($user);
         }
 
         // is Admin?
