@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkangular_diceApp=self.webpackChunkangular_diceApp||[]).push([[592],{2486:(p,n,c)=>{c.d(n,{W:()=>t});var o=c(2096);let t=(()=>{class e{constructor(){}isHttpErrorResponse(r){return"error"in r}}return e.\u0275fac=function(r){return new(r||e)},e.\u0275prov=o.Yz7({token:e,factory:e.\u0275fac,providedIn:"root"}),e})()}}]);
