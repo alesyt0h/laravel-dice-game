@@ -91,4 +91,20 @@ class AuthController extends Controller
         return response()->json(['message' => 'You have been logged out']);
     }
 
+    public function verify(Request $request){
+
+        $validToken = Auth::guard('api')->check();
+
+        if($validToken){
+            $user = Auth::user();
+        }
+
+        // is Admin?
+        if ($request->user()->tokenCan('administrate')) {
+            $admin = true;
+        }
+
+        return response()->json(['user' => $user ?? null, 'admin' => $admin ?? false]);
+    }
+
 }
