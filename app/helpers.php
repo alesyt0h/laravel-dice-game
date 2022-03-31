@@ -58,7 +58,7 @@ use App\Models\Game;
                         $initialValue = $players[$i]->winning_percentage;
                         $resultingPlayer = $players[$i];
                     } else if(isset($resultingPlayer) && $resultingPlayer->winning_percentage === $players[$i]->winning_percentage){
-                        if(count($players[$i]->throws) > count($resultingPlayer->throws)){
+                        if(count($players[$i]->throws ?? []) > count($resultingPlayer->throws ?? [])){
                             $resultingPlayer = $players[$i];
                         }
                     }
